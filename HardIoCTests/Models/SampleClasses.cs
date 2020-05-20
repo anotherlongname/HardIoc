@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HardIoCTests.Models
+{
+    public interface ITransientClass { }
+    public class TransientClass : ITransientClass
+    {
+
+    }
+
+    public interface ISingletonClass { }
+    public class SingletonClass : ISingletonClass
+    {
+        public SingletonClass(DependencyClass dependencyClass) { }
+    }
+
+    public class DependencyClass
+    {
+
+    }
+}
