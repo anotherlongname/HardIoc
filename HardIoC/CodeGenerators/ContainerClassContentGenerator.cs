@@ -30,7 +30,7 @@ namespace HardIoC.CodeGenerators
         }
 
         private string CreateSingletonVariableDeclaration(SingletonRegistration singletonRegistration)
-            => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name}";
+            => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
 
 
         // TODO : Uses recursion. Should use a stack instead

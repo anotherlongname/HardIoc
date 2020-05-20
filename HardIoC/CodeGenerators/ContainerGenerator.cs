@@ -14,7 +14,10 @@ namespace HardIoC.CodeGenerators
     [Generator]
     internal class ContainerGenerator : ISourceGenerator
     {
-        public void Initialize(InitializationContext context) { }
+        public void Initialize(InitializationContext context) 
+        {
+            //System.Diagnostics.Debugger.Launch();
+        }
 
         // TODO : Theoretically, we can location all instances of container.Resolve<T>() and generate off of that, can't we?
         public void Execute(SourceGeneratorContext context)
@@ -27,7 +30,7 @@ namespace HardIoC.CodeGenerators
 
                 foreach(var containerClass in containerClasses)
                 {
-                    var hintName = $"Generated{containerClass.FullyQualifiedName}";
+                    var hintName = $"Generated.{containerClass.FullyQualifiedName}";
                     var content = generator.GenerateClassString(containerClass);
                     context.AddSource(hintName, SourceText.From(content, Encoding.UTF8));
                 }

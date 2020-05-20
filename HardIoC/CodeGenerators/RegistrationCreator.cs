@@ -18,7 +18,7 @@ namespace HardIoC.CodeGenerators
 
         private static bool TryCreateTransientRegistration(this RegistrationSymbols registrationSymbols, INamedTypeSymbol typeSymbol, out Registration registration)
         {
-            if (registrationSymbols.TransientSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol)))
+            if (registrationSymbols.TransientSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol.OriginalDefinition)))
             {
                 registration = CreateTransientRegistration((INamedTypeSymbol)typeSymbol.TypeArguments.First(), (INamedTypeSymbol)typeSymbol.TypeArguments.Last());
                 return true;
@@ -30,7 +30,7 @@ namespace HardIoC.CodeGenerators
 
         private static bool TryCreateSingletonRegistration(this RegistrationSymbols registrationSymbols, INamedTypeSymbol typeSymbol, out Registration registration)
         {
-            if (registrationSymbols.SingletonSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol)))
+            if (registrationSymbols.SingletonSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol.OriginalDefinition)))
             {
                 registration = CreateSingletonRegistration((INamedTypeSymbol)typeSymbol.TypeArguments.First(), (INamedTypeSymbol)typeSymbol.TypeArguments.Last());
                 return true;
@@ -42,7 +42,7 @@ namespace HardIoC.CodeGenerators
 
         private static bool TryCreateDelegateRegistration(this RegistrationSymbols registrationSymbols, INamedTypeSymbol typeSymbol, out Registration registration)
         {
-            if (registrationSymbols.DelegateSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol)))
+            if (registrationSymbols.DelegateSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol.OriginalDefinition)))
             {
                 registration = CreateDelegateRegistration((INamedTypeSymbol)typeSymbol.TypeArguments.First(), typeSymbol.TypeArguments.Skip(1).OfType<INamedTypeSymbol>().ToArray());
                 return true;
