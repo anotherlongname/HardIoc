@@ -13,3 +13,4 @@ C# Compile-time IoC container generator made possible using Roslyn Code Generato
 - [ ] Correct error handling and code highlighting
 - [ ] Change `ConstructorFor` entrypoints with `Resolve<T>` instances
 - [ ] Usage documentation
+- [ ] Think of a better name
