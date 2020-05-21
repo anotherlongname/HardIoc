@@ -9,6 +9,7 @@ namespace HardIoC.IoC
         public interface Singleton<TService> { }
         public interface Singleton<TService, TImplimentation> where TImplimentation : TService { }
 
+        public interface Delegate<TService> { TService Create(); }
         public interface Delegate<TService, TDependency> { TService Create(TDependency dependency); }
         public interface Delegate<TService, TDependency1, TDependency2> { TService Create(TDependency1 dependency1, TDependency2 dependency2); }
         public interface Delegate<TService, TDependency1, TDependency2, TDependency3> { TService Create(TDependency1 dependency1, TDependency2 dependency2, TDependency3 dependency3); }

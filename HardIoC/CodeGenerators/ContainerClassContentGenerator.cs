@@ -55,7 +55,7 @@ namespace HardIoC.CodeGenerators
 
         // TODO : improve to follow full path for delegate stuff
         private string DelegateNode(DelegateRegistration node, string[] dependencies)
-            => $"((Functional.Structures.Register.Delegate<{node.Service.FullyQualifiedTypeName()}, {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
+            => $"((HardIoC.IoC.Register.Delegate<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
 
     }
 }

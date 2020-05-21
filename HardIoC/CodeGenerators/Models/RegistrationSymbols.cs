@@ -27,7 +27,7 @@ namespace HardIoC.CodeGenerators.Models
                 GetType(compilation, typeof(ConstructorForAttribute)),
                 new[] { GetType(compilation, typeof(Register.Transient<>)), GetType(compilation, typeof(Register.Transient<,>)) },
                 new[] { GetType(compilation, typeof(Register.Singleton<>)), GetType(compilation, typeof(Register.Singleton<,>)) },
-                new[] { GetType(compilation, typeof(Register.Delegate<,>)), GetType(compilation, typeof(Register.Delegate<,,>)), GetType(compilation, typeof(Register.Delegate<,,,>)), GetType(compilation, typeof(Register.Delegate<,,,>)), GetType(compilation, typeof(Register.Delegate<,,,,>)), GetType(compilation, typeof(Register.Delegate<,,,,,>)) });
+                new[] { GetType(compilation, typeof(Register.Delegate<>)), GetType(compilation, typeof(Register.Delegate<,>)), GetType(compilation, typeof(Register.Delegate<,,>)), GetType(compilation, typeof(Register.Delegate<,,,>)), GetType(compilation, typeof(Register.Delegate<,,,>)), GetType(compilation, typeof(Register.Delegate<,,,,>)), GetType(compilation, typeof(Register.Delegate<,,,,,>)) });
 
         private static INamedTypeSymbol GetType(Compilation compilation, Type type)
             => compilation.GetTypeByMetadataName(type.FullName) ?? throw new System.Exception($"Failed to find Named Type Symbol for {type.FullName}");

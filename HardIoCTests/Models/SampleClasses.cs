@@ -22,4 +22,6 @@ namespace HardIoCTests.Models
     {
 
     }
+
+    public delegate string StringDelegate();
 }

@@ -30,5 +30,16 @@ namespace HardIoCTests
 
             transient1.Should().NotBe(transient2);
         }
+
+        [Fact]
+        public void DelegateRegistrations_ConstructorValuesAreAccessable()
+        {
+            var value = "Test Value";
+            var container = new TestContainer(value);
+            var stringDelegate = container.CreateStringDelegate();
+
+            stringDelegate().Should().Be(value);
+        }
+ 
     }
 }
