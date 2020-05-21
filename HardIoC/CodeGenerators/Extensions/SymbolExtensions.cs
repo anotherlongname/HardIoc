@@ -18,10 +18,22 @@ namespace HardIoC.CodeGenerators.Extensions
             return string.Join(".", namespaces.ToArray().Reverse());
         }
 
+        public static string RecursiveContainingSymbol(this ISymbol containingSymbol)
+        {
+            var symbols = new List<string>();
+            while (!string.IsNullOrWhiteSpace(containingSymbol?.Name))
+            {
+                symbols.Add(containingSymbol.Name);
+                containingSymbol = containingSymbol.ContainingSymbol;
+            }
+            return string.Join(".", symbols.ToArray().Reverse());
 
-        // This might not be needed
+        }
+
+
+        // TODO : This might not be needed. Look at best way to do a fully qualified object
         public static string FullyQualifiedTypeName(this ITypeSymbol typeSymbol)
-            => $"{typeSymbol.ContainingNamespace.FullyQualifiedNamespace()}.{typeSymbol.Name}";
+            => $"{typeSymbol.ContainingSymbol.RecursiveContainingSymbol()}.{typeSymbol.Name}";
 
 
 

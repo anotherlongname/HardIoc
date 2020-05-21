@@ -42,9 +42,10 @@ namespace HardIoC.CodeGenerators
 
         private static bool TryCreateDelegateRegistration(this RegistrationSymbols registrationSymbols, INamedTypeSymbol typeSymbol, out Registration registration)
         {
-            if (registrationSymbols.DelegateSymbols.Any(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol.OriginalDefinition)))
+            var delegateMatch = registrationSymbols.DelegateSymbols.FirstOrDefault(s => SymbolEqualityComparer.Default.Equals(s, typeSymbol.OriginalDefinition));
+            if (delegateMatch != null)
             {
-                registration = CreateDelegateRegistration((INamedTypeSymbol)typeSymbol.TypeArguments.First(), typeSymbol.TypeArguments.Skip(1).OfType<INamedTypeSymbol>().ToArray());
+                registration = CreateDelegateRegistration(delegateMatch, (INamedTypeSymbol)typeSymbol.TypeArguments.First(), typeSymbol.TypeArguments.Skip(1).OfType<INamedTypeSymbol>().ToArray());
                 return true;
             }
 
@@ -82,8 +83,8 @@ namespace HardIoC.CodeGenerators
                         .Select(p => p.Type)
                         .ToArray()));
 
-        private static Registration CreateDelegateRegistration(INamedTypeSymbol serviceType, INamedTypeSymbol[] dependencyTypes)
-            => new Registration(new DelegateRegistration(serviceType, dependencyTypes));
+        private static Registration CreateDelegateRegistration(INamedTypeSymbol delegateType, INamedTypeSymbol serviceType, INamedTypeSymbol[] dependencyTypes)
+            => new Registration(new DelegateRegistration(delegateType, serviceType, dependencyTypes));
 
     }
 }

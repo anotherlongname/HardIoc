@@ -53,9 +53,8 @@ namespace HardIoC.CodeGenerators
         private string SingletonNode(SingletonRegistration node, string[] dependencies)
             => $"__{node.Service.Name} ?? (__{node.Service.Name} = new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)}))";
 
-        // TODO : improve to follow full path for delegate stuff
         private string DelegateNode(DelegateRegistration node, string[] dependencies)
-            => $"((HardIoC.IoC.Register.Delegate<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
+            => $"(({node.DelegateType.FullyQualifiedTypeName()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
 
     }
 }
