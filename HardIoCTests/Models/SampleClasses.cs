@@ -9,7 +9,7 @@ namespace HardIoCTests.Models
     public interface ITransientClass { }
     public class TransientClass : ITransientClass
     {
-
+        public TransientClass(GenericClass<int> test) { }
     }
 
     public interface ISingletonClass { }

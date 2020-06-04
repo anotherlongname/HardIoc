@@ -14,7 +14,8 @@ namespace HardIoCTests.Models
         Register.Transient<ITransientClass, TransientClass>,
         Register.Singleton<ISingletonClass, SingletonClass>,
         Register.Transient<DependencyClass>,
-        Register.Delegate<StringDelegate>
+        Register.Delegate<StringDelegate>,
+        Register.Transient<GenericClass<int>>
     {
         private readonly string _stringDelegateContents;
 
@@ -31,4 +32,7 @@ namespace HardIoCTests.Models
         public StringDelegate Create()
             => () => _stringDelegateContents;
     }
+
+    public class GenericClass<T>
+    { }
 }
