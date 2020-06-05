@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using HardIoC.CodeGenerators.Extensions;
 using HardIoC.CodeGenerators.Models;
 using Microsoft.CodeAnalysis;
@@ -33,18 +35,36 @@ namespace HardIoC.CodeGenerators
             => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
 
 
-        // TODO : Uses recursion. Should use a stack instead
         private string CreateServiceConstructor(ITypeSymbol serviceType, DependencyGraph dependencyGraph)
             => $"public {serviceType.FullyQualifiedTypeName()} Create{serviceType.Name}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
 
-        // TODO : Finish and refactor
         private string ProduceNode(Registration node, DependencyGraph dependencyGraph)
+            => TryProduceNode(node, dependencyGraph)
+                .Match(
+                    node => node, 
+                    () => throw new System.Exception("Failed to find dependency for TODO"));
+
+        // TODO : Uses recursion. Should use a stack (queue?) instead. Also needs refactoring
+        private Option<string> TryProduceNode(Registration node, DependencyGraph dependencyGraph)
         {
-            var dependencies = node.Dependencies().Select(d => ProduceNode(dependencyGraph.Resolve(d), dependencyGraph)).ToArray();
-            return node.Match(
-                t => TransientNode(t, dependencies),
-                s => SingletonNode(s, dependencies),
-                d => DelegateNode(d, dependencies));
+            foreach (var group in node.DependencyGroups().OrderBy(g => g.Length))
+            {
+                var dependencies = group
+                    .Select(dependencyGraph.TryResolve)
+                    .WhereAllSome()
+                    .Bind(deps => deps.Select(d => TryProduceNode(d, dependencyGraph)).WhereAllSome())
+                    .Match(d => (true, d), () => (false, default));
+
+                if(dependencies.Item1)
+                {
+                    return Option.Some(node.Match(
+                        t => TransientNode(t, dependencies.Item2),
+                        s => SingletonNode(s, dependencies.Item2),
+                        d => DelegateNode(d, dependencies.Item2)));
+                }
+            }
+
+            return Option.None<string>();
         }
 
         private string TransientNode(TransientRegistration node, string[] dependencies)

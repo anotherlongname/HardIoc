@@ -4,15 +4,15 @@ namespace HardIoC.CodeGenerators.Models
 {
     internal class SingletonRegistration
     {
-        public SingletonRegistration(ITypeSymbol service, ITypeSymbol implementation, ITypeSymbol[] dependencies)
+        public SingletonRegistration(ITypeSymbol service, ITypeSymbol implementation, ITypeSymbol[][] dependencyGroups)
         {
             Service = service;
             Implementation = implementation;
-            Dependencies = dependencies;
+            DependencyGroups = dependencyGroups;
         }
 
         public ITypeSymbol Service { get; }
         public ITypeSymbol Implementation { get; }
-        public ITypeSymbol[] Dependencies { get; }
+        public ITypeSymbol[][] DependencyGroups { get; }
     }
 }

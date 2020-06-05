@@ -18,6 +18,9 @@ namespace HardIoC.CodeGenerators.Models
         public Registration Resolve(ITypeSymbol typeSymbol)
             => _registrationDictionary.TryGetValue(typeSymbol, out var value) ? value : throw new Exception($"Failed to find dependency: {typeSymbol.FullyQualifiedTypeName()}");
 
+        public Option<Registration> TryResolve(ITypeSymbol typeSymbol)
+            => _registrationDictionary.TryGetValue(typeSymbol, out var registration) ? Option.Some(registration) : Option.None<Registration>();
+
         // TODO : Probably not the best
         public Registration[] Registrations => _registrationDictionary.Values.ToArray();
 

@@ -54,8 +54,6 @@ namespace HardIoC.CodeGenerators
         }
 
 
-
-        // TODO : This chooses the largest constructor. Probably should do something else
         private static Registration CreateTransientRegistration(INamedTypeSymbol serviceType, INamedTypeSymbol implementationType)
             => new Registration(
                 new TransientRegistration(
@@ -64,12 +62,12 @@ namespace HardIoC.CodeGenerators
                     implementationType
                         .InstanceConstructors
                         .OrderBy(ctor => ctor.Parameters.Length)
-                        .First()
-                        .Parameters
-                        .Select(p => p.Type)
+                        .Select(ctor => ctor
+                            .Parameters
+                            .Select(p => p.Type)
+                            .ToArray())
                         .ToArray()));
 
-        // TODO : This chooses the largest constructor. Probably should do something else
         private static Registration CreateSingletonRegistration(INamedTypeSymbol serviceType, INamedTypeSymbol implementationType)
             => new Registration(
                 new SingletonRegistration(
@@ -78,13 +76,13 @@ namespace HardIoC.CodeGenerators
                     implementationType
                         .InstanceConstructors
                         .OrderBy(ctor => ctor.Parameters.Length)
-                        .First()
-                        .Parameters
-                        .Select(p => p.Type)
+                        .Select(ctor => ctor
+                            .Parameters
+                            .Select(p => p.Type)
+                            .ToArray())
                         .ToArray()));
 
         private static Registration CreateDelegateRegistration(INamedTypeSymbol delegateType, INamedTypeSymbol serviceType, INamedTypeSymbol[] dependencyTypes)
             => new Registration(new DelegateRegistration(delegateType, serviceType, dependencyTypes));
-
     }
 }

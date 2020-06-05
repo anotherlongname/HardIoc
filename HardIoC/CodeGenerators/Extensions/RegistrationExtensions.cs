@@ -12,11 +12,11 @@ namespace HardIoC.CodeGenerators.Extensions
                 s => s.Service,
                 d => d.Service);
 
-        public static ITypeSymbol[] Dependencies(this Registration registration)
+        public static ITypeSymbol[][] DependencyGroups(this Registration registration)
             => registration.Match(
-                t => t.Dependencies,
-                s => s.Dependencies,
-                d => d.Dependencies);
+                t => t.DependencyGroups,
+                s => s.DependencyGroups,
+                d => new[] { d.Dependencies });
 
         public static TransientRegistration[] TransientRegistrations(this Registration[] registrations)
             => registrations.Select(r => r.Match(
