@@ -61,7 +61,7 @@ namespace HardIoC.CodeGenerators
                     implementationType,
                     implementationType
                         .InstanceConstructors
-                        .OrderBy(ctor => ctor.Parameters.Length)
+                        .OrderByDescending(ctor => ctor.Parameters.Length)
                         .Select(ctor => ctor
                             .Parameters
                             .Select(p => p.Type)
@@ -75,7 +75,7 @@ namespace HardIoC.CodeGenerators
                     implementationType,
                     implementationType
                         .InstanceConstructors
-                        .OrderBy(ctor => ctor.Parameters.Length)
+                        .OrderByDescending(ctor => ctor.Parameters.Length)
                         .Select(ctor => ctor
                             .Parameters
                             .Select(p => p.Type)

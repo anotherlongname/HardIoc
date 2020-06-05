@@ -29,4 +29,17 @@ namespace HardIoCTests.Models
     {
         
     }
+
+    public class MultiConstructorClass
+    {
+        public const string GoodValue = "Should be used";
+
+        public MultiConstructorClass() => Value = "Parameterless";
+        public MultiConstructorClass(string value) => Value = "string";
+        public MultiConstructorClass(DependencyClass dependencyClass, string value) => Value = "Dependency with string";
+        public MultiConstructorClass(DependencyClass dependencyClass) => Value = GoodValue;
+
+        public string Value { get; }
+    }
+
 }

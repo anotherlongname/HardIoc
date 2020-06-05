@@ -47,7 +47,7 @@ namespace HardIoC.CodeGenerators
         // TODO : Uses recursion. Should use a stack (queue?) instead. Also needs refactoring
         private Option<string> TryProduceNode(Registration node, DependencyGraph dependencyGraph)
         {
-            foreach (var group in node.DependencyGroups().OrderBy(g => g.Length))
+            foreach (var group in node.DependencyGroups())
             {
                 var dependencies = group
                     .Select(dependencyGraph.TryResolve)

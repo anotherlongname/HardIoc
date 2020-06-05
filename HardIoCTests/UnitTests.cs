@@ -40,6 +40,15 @@ namespace HardIoCTests
 
             stringDelegate().Should().Be(value);
         }
+
+        [Fact]
+        public void MultipleConstructors_ConstructorWithMostSatisfiableDependenciesShouldBeSelected()
+        {
+            var container = new TestContainer();
+            var multiConstructor = container.CreateMultiConstructorClass();
+
+            multiConstructor.Value.Should().Be(MultiConstructorClass.GoodValue);
+        }
  
     }
 }

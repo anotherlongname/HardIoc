@@ -10,12 +10,14 @@ namespace HardIoCTests.Models
     [ConstructorFor(typeof(ITransientClass))]
     [ConstructorFor(typeof(ISingletonClass))]
     [ConstructorFor(typeof(StringDelegate))]
+    [ConstructorFor(typeof(MultiConstructorClass))]
     public partial class TestContainer : Container,
         Register.Transient<ITransientClass, TransientClass>,
         Register.Singleton<ISingletonClass, SingletonClass>,
         Register.Transient<DependencyClass>,
         Register.Delegate<StringDelegate>,
-        Register.Transient<GenericClass<int>>
+        Register.Transient<GenericClass<int>>,
+        Register.Transient<MultiConstructorClass>
     {
         private readonly string _stringDelegateContents;
 
