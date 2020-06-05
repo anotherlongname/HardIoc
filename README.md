@@ -11,7 +11,7 @@ C# Compile-time IoC container generator made possible using Roslyn Code Generato
 - [ ] Support for multi-constructor dependencies (currently chooses largest constructor)
 - [ ] Validation of dependency graph
 - [ ] Correct error handling and code highlighting
-- [ ] Work with Generic types correctly
+- [x] Work with Generic types correctly
 - [ ] Change `ConstructorFor` entrypoints with `Resolve<T>` instances
 - [ ] Usage documentation
 - [ ] Think of a better name
