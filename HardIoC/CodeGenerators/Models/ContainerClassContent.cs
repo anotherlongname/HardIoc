@@ -28,6 +28,8 @@ namespace " + _namespace + @"
 " + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t" + s)) + @"
 
 " + string.Join("\n", _serviceConstructorMethods.Select(s => "\t\t" + s)) + @"
+
+        public override T Resolve<T>() => default;
     }
 }";
     }

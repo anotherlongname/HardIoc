@@ -36,6 +36,9 @@ namespace HardIoCTests
         {
             var value = "Test Value";
             var container = new TestContainer(value);
+
+            var i = container.Resolve<int>();
+
             var stringDelegate = container.CreateStringDelegate();
 
             stringDelegate().Should().Be(value);

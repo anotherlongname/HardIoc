@@ -8,6 +8,7 @@ namespace HardIoC.CodeGenerators.Models
     {
         public ContainerClassDescription(ITypeSymbol[] containerTypeInstances)
         {
+            TypeSymbols = containerTypeInstances;
             FullyQualifiedName = containerTypeInstances.First()?.FullyQualifiedTypeName();
             FullyQualifiedNamespace = containerTypeInstances.First()?.ContainingNamespace.FullyQualifiedNamespace();
             ShortName = containerTypeInstances.First()?.Name;
@@ -15,6 +16,7 @@ namespace HardIoC.CodeGenerators.Models
             AllAttributes = containerTypeInstances.SelectMany(c => c.GetAttributes()).ToArray();
         }
 
+        public ITypeSymbol[] TypeSymbols { get; }
         public INamedTypeSymbol[] AllInterfaces { get; }
         public AttributeData[] AllAttributes { get; }
         public string FullyQualifiedName { get; }

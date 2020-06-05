@@ -5,8 +5,10 @@ using System.Text;
 using HardIoC.CodeGenerators.Errors;
 using HardIoC.CodeGenerators.Extensions;
 using HardIoC.CodeGenerators.Models;
+using HardIoC.IoC;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.Text;
 
 namespace HardIoC.CodeGenerators
@@ -30,6 +32,11 @@ namespace HardIoC.CodeGenerators
 
                 foreach(var containerClass in containerClasses)
                 {
+                    var type = context.Compilation.GetTypeByMetadataName(typeof(Container).FullName);
+                    var info = type.GetMembers().OfType<IMethodSymbol>().Where(i => i.IsAbstract && i.Name == nameof(Container.Resolve)).First();
+                    SymbolFinder.FindReferencesAsync(info, context.Compilation.)
+                    WriteOutDebugFile("Test.cs", string.Join("\n", info));
+
                     var hintName = $"Generated.{containerClass.FullyQualifiedName}";
                     var content = generator.GenerateClassString(containerClass);
 
