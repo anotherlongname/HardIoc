@@ -54,7 +54,7 @@ namespace HardIoC.CodeGenerators
             => $"__{node.Service.Name} ?? (__{node.Service.Name} = new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)}))";
 
         private string DelegateNode(DelegateRegistration node, string[] dependencies)
-            => $"(({node.DelegateType.FullyQualifiedTypeName()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
+            => $"(({node.DelegateType.RecursiveContainingSymbol()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
 
     }
 }

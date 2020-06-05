@@ -32,6 +32,8 @@ namespace HardIoC.CodeGenerators
                 {
                     var hintName = $"Generated.{containerClass.FullyQualifiedName}";
                     var content = generator.GenerateClassString(containerClass);
+
+                    WriteOutDebugFile(hintName, content);
                     context.AddSource(hintName, SourceText.From(content, Encoding.UTF8));
                 }
             }
@@ -44,6 +46,19 @@ namespace HardIoC.CodeGenerators
                 var descriptor = new DiagnosticDescriptor(DiagnosticConstants.UnknownExceptionId, "Unexpected error", $"Unknown error during generation: {ex.Message}", DiagnosticConstants.Category, DiagnosticSeverity.Error, true);
                 context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None));
             }
+        }
+
+        // TODO : Remove when possible to peek into generated code
+        private void WriteOutDebugFile(string hintName, string content)
+        {
+#if DEBUG
+            try
+            {
+                System.IO.Directory.CreateDirectory("obj/gen");
+                System.IO.File.WriteAllText($"obj/gen/{hintName}.cs", content);
+            }
+            catch { }
+#endif
         }
 
         private ContainerClassDescription[] LocateContainerSymbols(SourceGeneratorContext context, INamedTypeSymbol containerSymbol)

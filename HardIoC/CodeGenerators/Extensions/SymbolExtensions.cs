@@ -33,7 +33,8 @@ namespace HardIoC.CodeGenerators.Extensions
 
         // TODO : This might not be needed. Look at best way to do a fully qualified object
         public static string FullyQualifiedTypeName(this ITypeSymbol typeSymbol)
-            => $"{typeSymbol.ContainingSymbol.RecursiveContainingSymbol()}.{typeSymbol.Name}";
+            => typeSymbol.ToDisplayString();
+            //=> $"{typeSymbol.ContainingSymbol.RecursiveContainingSymbol()}.{typeSymbol.Name}";
 
 
 

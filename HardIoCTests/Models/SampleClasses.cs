@@ -24,4 +24,9 @@ namespace HardIoCTests.Models
     }
 
     public delegate string StringDelegate();
+
+    public class GenericClass<T>
+    {
+        
+    }
 }

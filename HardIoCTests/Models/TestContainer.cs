@@ -33,6 +33,4 @@ namespace HardIoCTests.Models
             => () => _stringDelegateContents;
     }
 
-    public class GenericClass<T>
-    { }
 }
