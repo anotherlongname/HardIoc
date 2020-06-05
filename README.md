@@ -8,7 +8,7 @@ C# Compile-time IoC container generator made possible using Roslyn Code Generato
 - [x] Singleton Registration
 - [x] Delegate Registration
 - [ ] Factory Registration
-- [ ] Support for multi-constructor dependencies (currently chooses largest constructor)
+- [x] Support for multi-constructor dependencies (currently chooses largest constructor)
 - [ ] Validation of dependency graph
 - [ ] Correct error handling and code highlighting
 - [x] Work with Generic types correctly
