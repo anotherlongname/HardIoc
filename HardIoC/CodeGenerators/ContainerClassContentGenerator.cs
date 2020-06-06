@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HardIoC.CodeGenerators.Extensions;
@@ -26,23 +27,32 @@ namespace HardIoC.CodeGenerators
 
             var serviceConstructorMethods = typesRequiringConstructors.Select(t => CreateServiceConstructor(t, dependencyGraph)).ToArray();
             var singletonVariableDeclarations = dependencyGraph.Registrations.SingletonRegistrations().Select(CreateSingletonVariableDeclaration).ToArray();
+            var factoryClasses = registrations.FactoryRegistrations().Select(f => CreateFactoryClassDeclaration(f, dependencyGraph)).ToArray(); // TODO
 
-            var content = new ContainerClassContent(containerClassDescription.FullyQualifiedNamespace, containerClassDescription.ShortName, singletonVariableDeclarations, serviceConstructorMethods);
+            var content = new ContainerClassContent(containerClassDescription.FullyQualifiedNamespace, containerClassDescription.ShortName, singletonVariableDeclarations, serviceConstructorMethods, factoryClasses);
             return content.AsString();
         }
+
+        private string CreateFactoryClassDeclaration(FactoryRegistration factoryRegistration, DependencyGraph dependencyGraph)
+            => @$"private class {factoryRegistration.ImplimentationName} : {factoryRegistration.Service.FullyQualifiedTypeName()}
+        {{
+            {string.Join("\n\t\t\t", factoryRegistration.ServiceMethods.Select(method => CreateServiceConstructorWithName(method.Name, method.ReturnType, dependencyGraph)))}
+        }}";
 
         private string CreateSingletonVariableDeclaration(SingletonRegistration singletonRegistration)
             => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
 
+        private string CreateServiceConstructorWithName(string constructorName, ITypeSymbol serviceType, DependencyGraph dependencyGraph)
+            => $"public {serviceType.FullyQualifiedTypeName()} {constructorName}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
 
         private string CreateServiceConstructor(ITypeSymbol serviceType, DependencyGraph dependencyGraph)
-            => $"public {serviceType.FullyQualifiedTypeName()} Create{serviceType.Name}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
+            => CreateServiceConstructorWithName($"Create{serviceType.Name}", serviceType, dependencyGraph);
 
         private string ProduceNode(Registration node, DependencyGraph dependencyGraph)
             => TryProduceNode(node, dependencyGraph)
                 .Match(
                     node => node, 
-                    () => throw new System.Exception("Failed to find dependency for TODO"));
+                    () => throw new System.Exception($"Failed to resolve dependencies for {node.Service().FullyQualifiedTypeName()}"));
 
         // TODO : Uses recursion. Should use a stack (queue?) instead. Also needs refactoring
         private Option<string> TryProduceNode(Registration node, DependencyGraph dependencyGraph)
@@ -60,7 +70,8 @@ namespace HardIoC.CodeGenerators
                     return Option.Some(node.Match(
                         t => TransientNode(t, dependencies.Item2),
                         s => SingletonNode(s, dependencies.Item2),
-                        d => DelegateNode(d, dependencies.Item2)));
+                        d => DelegateNode(d, dependencies.Item2),
+                        f => FactoryNode(f, dependencies.Item2)));
                 }
             }
 
@@ -75,6 +86,9 @@ namespace HardIoC.CodeGenerators
 
         private string DelegateNode(DelegateRegistration node, string[] dependencies)
             => $"(({node.DelegateType.RecursiveContainingSymbol()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
+
+        private string FactoryNode(FactoryRegistration node, string[] dependencies)
+            => "";
 
     }
 }

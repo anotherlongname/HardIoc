@@ -8,13 +8,15 @@ namespace HardIoC.CodeGenerators.Models
         private readonly string _className;
         private readonly string[] _singletonVariableDeclarations;
         private readonly string[] _serviceConstructorMethods;
+        private readonly string[] _factoryClassDeclarations;
 
-        public ContainerClassContent(string @namespace, string className, string[] singletonVariableDeclarations, string[] serviceConstructorMethods)
+        public ContainerClassContent(string @namespace, string className, string[] singletonVariableDeclarations, string[] serviceConstructorMethods, string[] factoryClassDeclarations)
         {
             _namespace = @namespace;
             _className = className;
             _singletonVariableDeclarations = singletonVariableDeclarations;
             _serviceConstructorMethods = serviceConstructorMethods;
+            _factoryClassDeclarations = factoryClassDeclarations;
         }
 
         public string AsString()
@@ -28,6 +30,8 @@ namespace " + _namespace + @"
 " + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t" + s)) + @"
 
 " + string.Join("\n", _serviceConstructorMethods.Select(s => "\t\t" + s)) + @"
+
+" + string.Join("\n", _factoryClassDeclarations.Select(f => "\t\t" + f)) + @"
     }
 }";
     }

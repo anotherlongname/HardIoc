@@ -17,7 +17,8 @@ namespace HardIoCTests.Models
         Register.Transient<DependencyClass>,
         Register.Delegate<StringDelegate>,
         Register.Transient<GenericClass<int>>,
-        Register.Transient<MultiConstructorClass>
+        Register.Transient<MultiConstructorClass>,
+        Register.Factory<IExampleFactory>
     {
         private readonly string _stringDelegateContents;
 
