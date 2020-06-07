@@ -19,7 +19,7 @@ namespace HardIoC.CodeGenerators.Extensions
                 t => t.DependencyGroups,
                 s => s.DependencyGroups,
                 d => new[] { d.Dependencies },
-                f => Array.Empty<ITypeSymbol[]>());
+                f => new[] { Array.Empty<ITypeSymbol>() });
 
         public static TransientRegistration[] TransientRegistrations(this Registration[] registrations)
             => registrations.Select(r => r.Match(

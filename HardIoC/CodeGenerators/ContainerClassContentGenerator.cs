@@ -26,8 +26,10 @@ namespace HardIoC.CodeGenerators
             var dependencyGraph = DependencyGraph.FromRegistrations(registrations);
 
             var serviceConstructorMethods = typesRequiringConstructors.Select(t => CreateServiceConstructor(t, dependencyGraph)).ToArray();
-            var singletonVariableDeclarations = dependencyGraph.Registrations.SingletonRegistrations().Select(CreateSingletonVariableDeclaration).ToArray();
-            var factoryClasses = registrations.FactoryRegistrations().Select(f => CreateFactoryClassDeclaration(f, dependencyGraph)).ToArray(); // TODO
+
+            var factoryClasses = registrations.FactoryRegistrations().Select(f => CreateFactoryClassDeclaration(f, dependencyGraph)).ToArray();
+            var singletonVariableDeclarations = dependencyGraph.Registrations.SingletonRegistrations().Select(CreateSingletonVariableDeclaration)
+                .Concat(registrations.FactoryRegistrations().Select(CreateFactoryVariableDeclaration)).ToArray();
 
             var content = new ContainerClassContent(containerClassDescription.FullyQualifiedNamespace, containerClassDescription.ShortName, singletonVariableDeclarations, serviceConstructorMethods, factoryClasses);
             return content.AsString();
@@ -41,6 +43,9 @@ namespace HardIoC.CodeGenerators
 
         private string CreateSingletonVariableDeclaration(SingletonRegistration singletonRegistration)
             => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
+
+        private string CreateFactoryVariableDeclaration(FactoryRegistration factoryRegistration)
+            => $"private {factoryRegistration.Service.FullyQualifiedTypeName()} __{factoryRegistration.Service.Name};";
 
         private string CreateServiceConstructorWithName(string constructorName, ITypeSymbol serviceType, DependencyGraph dependencyGraph)
             => $"public {serviceType.FullyQualifiedTypeName()} {constructorName}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
@@ -88,7 +93,7 @@ namespace HardIoC.CodeGenerators
             => $"(({node.DelegateType.RecursiveContainingSymbol()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
 
         private string FactoryNode(FactoryRegistration node, string[] dependencies)
-            => "";
+            => $"__{node.Service.Name} ?? (__{node.Service.Name} = new {node.ImplimentationName}({string.Join(", ", dependencies)}))";
 
     }
 }
