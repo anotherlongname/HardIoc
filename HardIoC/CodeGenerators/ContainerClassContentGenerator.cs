@@ -38,14 +38,18 @@ namespace HardIoC.CodeGenerators
         private string CreateFactoryClassDeclaration(FactoryRegistration factoryRegistration, DependencyGraph dependencyGraph)
             => @$"private class {factoryRegistration.ImplimentationName} : {factoryRegistration.Service.FullyQualifiedTypeName()}
         {{
+            private readonly SingletonInstances _SingletonInstances;
+
+            public {factoryRegistration.ImplimentationName}(SingletonInstances singletonInstances) => _SingletonInstances = singletonInstances;
+
             {string.Join("\n\t\t\t", factoryRegistration.ServiceMethods.Select(method => CreateServiceConstructorWithName(method.Name, method.ReturnType, dependencyGraph)))}
         }}";
 
         private string CreateSingletonVariableDeclaration(SingletonRegistration singletonRegistration)
-            => $"private {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
+            => $"public {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
 
         private string CreateFactoryVariableDeclaration(FactoryRegistration factoryRegistration)
-            => $"private {factoryRegistration.Service.FullyQualifiedTypeName()} __{factoryRegistration.Service.Name};";
+            => $"public {factoryRegistration.Service.FullyQualifiedTypeName()} __{factoryRegistration.Service.Name};";
 
         private string CreateServiceConstructorWithName(string constructorName, ITypeSymbol serviceType, DependencyGraph dependencyGraph)
             => $"public {serviceType.FullyQualifiedTypeName()} {constructorName}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
@@ -87,13 +91,13 @@ namespace HardIoC.CodeGenerators
             => $"new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)})";
 
         private string SingletonNode(SingletonRegistration node, string[] dependencies)
-            => $"__{node.Service.Name} ?? (__{node.Service.Name} = new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)}))";
+            => $"(_SingletonInstances.__{node.Service.Name} ??= new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)}))";
 
         private string DelegateNode(DelegateRegistration node, string[] dependencies)
             => $"(({node.DelegateType.RecursiveContainingSymbol()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
 
         private string FactoryNode(FactoryRegistration node, string[] dependencies)
-            => $"__{node.Service.Name} ?? (__{node.Service.Name} = new {node.ImplimentationName}({string.Join(", ", dependencies)}))";
+            => $"(_SingletonInstances.__{node.Service.Name} ??= new {node.ImplimentationName}({string.Join(", ", new[] { "_SingletonInstances" }.Concat(dependencies))}))";
 
     }
 }

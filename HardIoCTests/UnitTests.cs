@@ -55,7 +55,18 @@ namespace HardIoCTests
         {
             var container = new TestContainer();
             var factory = container.CreateIExampleFactory();
-            var createdClass = factory.Create();
+            var createdClass = factory.CreateDependencyClass();
+        }
+
+        [Fact]
+        public void Factory_SingletonInstanceShouldBeSingletonAcrossContainer()
+        {
+            var container = new TestContainer();
+            var factory = container.CreateIExampleFactory();
+            var singleton = factory.CreateSingletonClass();
+            var otherSingleton = container.CreateISingletonClass();
+
+            singleton.Should().Be(otherSingleton);
         }
  
     }

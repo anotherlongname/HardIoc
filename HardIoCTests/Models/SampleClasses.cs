@@ -30,9 +30,10 @@ namespace HardIoCTests.Models
         
     }
 
-    public interface IExampleFactory
+    public interface IExampleFactory 
     {
-        DependencyClass Create();
+        DependencyClass CreateDependencyClass();
+        ISingletonClass CreateSingletonClass();
     }
 
     public class MultiConstructorClass

@@ -33,7 +33,7 @@ namespace HardIoC.CodeGenerators
                     var hintName = $"Generated.{containerClass.FullyQualifiedName}";
                     var content = generator.GenerateClassString(containerClass);
 
-                    WriteOutDebugFile(hintName, content);
+                    WriteOutDebugFile(hintName, content, context);
                     context.AddSource(hintName, SourceText.From(content, Encoding.UTF8));
                 }
             }
@@ -49,15 +49,16 @@ namespace HardIoC.CodeGenerators
         }
 
         // TODO : Remove when possible to peek into generated code
-        private void WriteOutDebugFile(string hintName, string content)
+        private void WriteOutDebugFile(string hintName, string content, SourceGeneratorContext context)
         {
 #if DEBUG
             try
             {
-                System.IO.Directory.CreateDirectory("obj/gen");
-                System.IO.File.WriteAllText($"obj/gen/{hintName}.cs", content);
+                var tempFile = $"{System.IO.Path.GetTempPath()}{hintName}.cs";
+                System.IO.File.WriteAllText(tempFile, content);
+                context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor("GDBG", "Write out debug file", tempFile, DiagnosticConstants.Category, DiagnosticSeverity.Warning, true), Location.None));
             }
-            catch { }
+            catch { throw; }
 #endif
         }
 

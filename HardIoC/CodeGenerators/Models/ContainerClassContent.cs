@@ -27,7 +27,12 @@ namespace " + _namespace + @"
 {
     public partial class " + _className + @"
     {
-" + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t" + s)) + @"
+        private readonly SingletonInstances _SingletonInstances = new SingletonInstances();
+
+        private class SingletonInstances
+        {
+" + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t\t" + s)) + @"
+        }
 
 " + string.Join("\n", _serviceConstructorMethods.Select(s => "\t\t" + s)) + @"
 
