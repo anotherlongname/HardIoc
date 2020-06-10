@@ -11,6 +11,7 @@ namespace HardIoC.CodeGenerators
                     registrationSymbols.TryCreateTransientRegistration(i, out var reg1) ? (true, reg1) :
                     registrationSymbols.TryCreateSingletonRegistration(i, out var reg2) ? (true, reg2) :
                     registrationSymbols.TryCreateDelegateRegistration(i, out var reg3) ? (true, reg3) :
+                    registrationSymbols.TryCreateFactoryRegistration(i, out var reg4) ? (true, reg4) :
                     (false, default))
                 .Where(i => i.Item1)
                 .Select(i => i.Item2)
@@ -53,6 +54,18 @@ namespace HardIoC.CodeGenerators
             return false;
         }
 
+        private static bool TryCreateFactoryRegistration(this RegistrationSymbols registrationSymbols, INamedTypeSymbol typeSymbol, out Registration registration)
+        {
+            if (SymbolEqualityComparer.Default.Equals(registrationSymbols.FactorySymbol, typeSymbol.OriginalDefinition))
+            {
+                registration = CreateFactoryRegistration((INamedTypeSymbol)typeSymbol.TypeArguments.First());
+                return true;
+            }
+
+            registration = default;
+            return false;
+        }
+
 
         private static Registration CreateTransientRegistration(INamedTypeSymbol serviceType, INamedTypeSymbol implementationType)
             => new Registration(
@@ -84,5 +97,8 @@ namespace HardIoC.CodeGenerators
 
         private static Registration CreateDelegateRegistration(INamedTypeSymbol delegateType, INamedTypeSymbol serviceType, INamedTypeSymbol[] dependencyTypes)
             => new Registration(new DelegateRegistration(delegateType, serviceType, dependencyTypes));
+
+        private static Registration CreateFactoryRegistration(INamedTypeSymbol factoryType)
+            => new Registration(new FactoryRegistration(factoryType));
     }
 }

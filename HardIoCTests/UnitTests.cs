@@ -49,6 +49,25 @@ namespace HardIoCTests
 
             multiConstructor.Value.Should().Be(MultiConstructorClass.GoodValue);
         }
+
+        [Fact]
+        public void FactoryWorks()
+        {
+            var container = new TestContainer();
+            var factory = container.CreateIExampleFactory();
+            var createdClass = factory.CreateDependencyClass();
+        }
+
+        [Fact]
+        public void Factory_SingletonInstanceShouldBeSingletonAcrossContainer()
+        {
+            var container = new TestContainer();
+            var factory = container.CreateIExampleFactory();
+            var singleton = factory.CreateSingletonClass();
+            var otherSingleton = container.CreateISingletonClass();
+
+            singleton.Should().Be(otherSingleton);
+        }
  
     }
 }

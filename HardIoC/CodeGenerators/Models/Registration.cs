@@ -25,10 +25,17 @@ namespace HardIoC.CodeGenerators.Models
             _value = delegateRegistration;
         }
 
+        public Registration(FactoryRegistration factoryRegistration)
+        {
+            _registrationType = RegistrationTypeEnum.Factory;
+            _value = factoryRegistration;
+        }
+
         public T Match<T>(
             Func<TransientRegistration, T> transientMatch,
             Func<SingletonRegistration, T> singletonMatch,
-            Func<DelegateRegistration, T> delegateMatch)
+            Func<DelegateRegistration, T> delegateMatch,
+            Func<FactoryRegistration, T> factoryMatch)
         {
             switch (_registrationType)
             {
@@ -38,6 +45,8 @@ namespace HardIoC.CodeGenerators.Models
                     return singletonMatch((SingletonRegistration)_value);
                 case RegistrationTypeEnum.Delegate:
                     return delegateMatch((DelegateRegistration)_value);
+                case RegistrationTypeEnum.Factory:
+                    return factoryMatch((FactoryRegistration)_value);
                 case RegistrationTypeEnum.Defaulted:
                     throw new Exception($"Default value not is invalid for {nameof(Registration)} type");
                 default:
@@ -45,6 +54,6 @@ namespace HardIoC.CodeGenerators.Models
             }
         }
 
-        private enum RegistrationTypeEnum { Defaulted, Transient, Singleton, Delegate }
+        private enum RegistrationTypeEnum { Defaulted, Transient, Singleton, Delegate, Factory }
     }
 }

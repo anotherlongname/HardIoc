@@ -26,5 +26,8 @@ namespace HardIoC.CodeGenerators.Extensions
 
         public static Option<U> Bind<T, U>(this Option<T> option, Func<T, Option<U>> bindFunc)
             => option.Match(bindFunc, () => Option.None<U>());
+
+        public static Option<U> Map<T, U>(this Option<T> option, Func<T, U> mapFunc)
+            => option.Match(opt => Option.Some(mapFunc(opt)), () => Option.None<U>());
     }
 }

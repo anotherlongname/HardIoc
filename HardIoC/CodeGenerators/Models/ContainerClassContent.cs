@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using HardIoC.CodeGenerators.Extensions;
 
 namespace HardIoC.CodeGenerators.Models
 {
@@ -6,29 +7,76 @@ namespace HardIoC.CodeGenerators.Models
     {
         private readonly string _namespace;
         private readonly string _className;
-        private readonly string[] _singletonVariableDeclarations;
-        private readonly string[] _serviceConstructorMethods;
+        private readonly SingletonVariableDeclaration[] _singletonVariableDeclarations;
+        private readonly ServiceConstructor[] _serviceConstructorMethods;
+        private readonly FactoryClassDeclaration[] _factoryClassDeclarations;
 
-        public ContainerClassContent(string @namespace, string className, string[] singletonVariableDeclarations, string[] serviceConstructorMethods)
+        public ContainerClassContent(string @namespace, string className, SingletonVariableDeclaration[] singletonVariableDeclarations, ServiceConstructor[] serviceConstructorMethods, FactoryClassDeclaration[] factoryClassDeclarations)
         {
             _namespace = @namespace;
             _className = className;
             _singletonVariableDeclarations = singletonVariableDeclarations;
             _serviceConstructorMethods = serviceConstructorMethods;
+            _factoryClassDeclarations = factoryClassDeclarations;
         }
 
         public string AsString()
-            => @"
+            => $@"
 using System;
 
-namespace " + _namespace + @"
-{
-    public partial class " + _className + @"
-    {
-" + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t" + s)) + @"
+namespace {_namespace}
+{{
+    public partial class {_className}
+    {{
+        private readonly SingletonInstances _SingletonInstances = new SingletonInstances();
 
-" + string.Join("\n", _serviceConstructorMethods.Select(s => "\t\t" + s)) + @"
-    }
-}";
+        private class SingletonInstances
+        {{
+            {StringSingletonVariableDeclarations()}
+        }}
+
+        {StringServiceConstructorMethods(_serviceConstructorMethods)}
+
+        {StringFactoryClassDeclarations()}
+    }}
+}}";
+
+        private string StringSingletonVariableDeclarations()
+            => string.Join("\n\t\t\t", _singletonVariableDeclarations.Select(s => $"public {s.SingletonTypeName} __{s.SingletonVariableName};"));
+
+        private string StringServiceConstructorMethods(ServiceConstructor[] serviceConstructors)
+            => string.Join("\n\t\t", serviceConstructors.Select(m => $"public {m.ServiceTypeName} {m.ConstructorName}() => {UnwrapNode(m.Dependencies)};"));
+
+        private string UnwrapNode(DependencyNode node)
+            => node.Match(
+                t => StringTransientNode(t, t.Dependencies.Select(UnwrapNode).ToArray()),
+                s => StringSingletonNode(s, s.Dependencies.Select(UnwrapNode).ToArray()),
+                d => StringDelegateNode(d, d.Dependencies.Select(UnwrapNode).ToArray()),
+                f => StringFactoryNode(f, f.Dependencies.Select(UnwrapNode).ToArray()));
+
+        private string StringTransientNode(TransientDependencyNode node, string[] dependencies)
+            => $"new {node.TypeName}({string.Join(", ", dependencies)})";
+
+        private string StringSingletonNode(SingletonDependencyNode node, string[] dependencies)
+            => $"(_SingletonInstances.__{node.InstanceName} ??= new {node.TypeName}({string.Join(", ", dependencies)}))";
+
+        private string StringDelegateNode(DelegateDependencyNode node, string[] dependencies)
+            => $"(({node.DelegateRegistrationTypeName}<{node.TypeName}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.TypeNames())}>)this).Create({string.Join(", ", dependencies)})";
+
+        private string StringFactoryNode(FactoryDependencyNode node, string[] dependencies)
+            => $"(_SingletonInstances.__{node.InstanceName} ??= new {node.ImplimentationName}({string.Join(", ", new[] { "_SingletonInstances" }.Concat(dependencies))}))";
+
+
+        private string StringFactoryClassDeclarations()
+            => string.Join("\n\t\t", _factoryClassDeclarations.Select(f => $@"
+        private class {f.FactoryImplimentationClassName} : {f.FactoryTypeName}
+        {{
+            private readonly SingletonInstances _SingletonInstances;
+
+            public {f.FactoryImplimentationClassName}(SingletonInstances singletonInstances) => _SingletonInstances = singletonInstances;
+
+            {StringServiceConstructorMethods(f.ServiceConstructorMethods)}
+        }}
+"));
     }
 }

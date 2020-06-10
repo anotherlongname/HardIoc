@@ -30,6 +30,12 @@ namespace HardIoCTests.Models
         
     }
 
+    public interface IExampleFactory 
+    {
+        DependencyClass CreateDependencyClass();
+        ISingletonClass CreateSingletonClass();
+    }
+
     public class MultiConstructorClass
     {
         public const string GoodValue = "Should be used";
