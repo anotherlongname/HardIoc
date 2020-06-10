@@ -2,14 +2,10 @@
 
 namespace HardIoC.CodeGenerators.Models
 {
-    internal class Option<T>
+    internal struct Option<T>
     {
         private readonly T _some;
         private readonly bool _hasSome;
-        public Option()
-        {
-            _hasSome = false;
-        }
 
         public Option(T some)
         {

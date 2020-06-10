@@ -63,29 +63,22 @@ namespace HardIoC.CodeGenerators
                     node => node, 
                     () => throw new System.Exception($"Failed to resolve dependencies for {node.Service().FullyQualifiedTypeName()}"));
 
-        // TODO : Uses recursion. Should use a stack (queue?) instead. Also needs refactoring
+        // TODO : Uses recursion. Should use a stack (queue?) instead
         private Option<string> TryProduceNode(Registration node, DependencyGraph dependencyGraph)
-        {
-            foreach (var group in node.DependencyGroups())
-            {
-                var dependencies = group
-                    .Select(dependencyGraph.TryResolve)
-                    .WhereAllSome()
-                    .Bind(deps => deps.Select(d => TryProduceNode(d, dependencyGraph)).WhereAllSome())
-                    .Match(d => (true, d), () => (false, default));
+            => node.DependencyGroups()
+                .Select(group => TryProduceDependencies(group, dependencyGraph))
+                .FirstOrDefault(dependencies => dependencies.HasValue())
+                .Map(dependencies => node.Match(
+                    t => TransientNode(t, dependencies),
+                    s => SingletonNode(s, dependencies),
+                    d => DelegateNode(d, dependencies),
+                    f => FactoryNode(f, dependencies)));
 
-                if(dependencies.Item1)
-                {
-                    return Option.Some(node.Match(
-                        t => TransientNode(t, dependencies.Item2),
-                        s => SingletonNode(s, dependencies.Item2),
-                        d => DelegateNode(d, dependencies.Item2),
-                        f => FactoryNode(f, dependencies.Item2)));
-                }
-            }
-
-            return Option.None<string>();
-        }
+        private Option<string[]> TryProduceDependencies(ITypeSymbol[] dependencyGroup, DependencyGraph dependencyGraph)
+            => dependencyGroup
+                .Select(dependencyGraph.TryResolve)
+                .WhereAllSome()
+                .Bind(dependencies => dependencies.Select(d => TryProduceNode(d, dependencyGraph)).WhereAllSome());
 
         private string TransientNode(TransientRegistration node, string[] dependencies)
             => $"new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)})";
