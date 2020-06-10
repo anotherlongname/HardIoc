@@ -7,11 +7,12 @@ C# Compile-time IoC container generator made possible using Roslyn Code Generato
 - [x] Transient Registration
 - [x] Singleton Registration
 - [x] Delegate Registration
-- [ ] Factory Registration
-- [x] Support for multi-constructor dependencies (currently chooses largest constructor)
+- [x] Work with Generic types correctly
+- [x] Support for multi-constructor dependencies
+- [x] Parameterless Factory Registration
+- [ ] Parameterized Factory Registration
 - [ ] Validation of dependency graph
 - [ ] Correct error handling and code highlighting
-- [x] Work with Generic types correctly
 - [ ] Change `ConstructorFor` entrypoints with `Resolve<T>` instances
 - [ ] Usage documentation
 - [ ] Think of a better name
