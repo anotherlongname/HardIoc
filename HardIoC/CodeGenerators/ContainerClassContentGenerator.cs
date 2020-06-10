@@ -86,7 +86,7 @@ namespace HardIoC.CodeGenerators
             => new DependencyNode(new DelegateDependencyNode(dependencies, node.DelegateType.RecursiveContainingSymbol(), node.Service.FullyQualifiedTypeName()));
 
         private DependencyNode FactoryNode(FactoryRegistration node, DependencyNode[] dependencies)
-            => new DependencyNode(new FactoryDependencyNode(dependencies, node.Service.Name, node.ImplimentationName));
+            => new DependencyNode(new FactoryDependencyNode(dependencies, node.Service.Name, node.Service.FullyQualifiedTypeName(), node.ImplimentationName));
 
     }
 }

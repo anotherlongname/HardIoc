@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using HardIoC.CodeGenerators.Extensions;
 
 namespace HardIoC.CodeGenerators.Models
 {
@@ -20,88 +21,62 @@ namespace HardIoC.CodeGenerators.Models
         }
 
         public string AsString()
-            => @"
+            => $@"
 using System;
 
-namespace " + _namespace + @"
-{
-    public partial class " + _className + @"
-    {
+namespace {_namespace}
+{{
+    public partial class {_className}
+    {{
         private readonly SingletonInstances _SingletonInstances = new SingletonInstances();
 
         private class SingletonInstances
-        {
-" + string.Join("\n", _singletonVariableDeclarations.Select(s => "\t\t\t" + s)) + @"
-        }
+        {{
+            {StringSingletonVariableDeclarations()}
+        }}
 
-" + string.Join("\n", _serviceConstructorMethods.Select(s => "\t\t" + s)) + @"
+        {StringServiceConstructorMethods(_serviceConstructorMethods)}
 
-" + string.Join("\n", _factoryClassDeclarations.Select(f => "\t\t" + f)) + @"
-    }
-}";
+        {StringFactoryClassDeclarations()}
+    }}
+}}";
+
+        private string StringSingletonVariableDeclarations()
+            => string.Join("\n\t\t\t", _singletonVariableDeclarations.Select(s => $"public {s.SingletonTypeName} __{s.SingletonVariableName};"));
+
+        private string StringServiceConstructorMethods(ServiceConstructor[] serviceConstructors)
+            => string.Join("\n\t\t", serviceConstructors.Select(m => $"public {m.ServiceTypeName} {m.ConstructorName}() => {UnwrapNode(m.Dependencies)};"));
+
+        private string UnwrapNode(DependencyNode node)
+            => node.Match(
+                t => StringTransientNode(t, t.Dependencies.Select(UnwrapNode).ToArray()),
+                s => StringSingletonNode(s, s.Dependencies.Select(UnwrapNode).ToArray()),
+                d => StringDelegateNode(d, d.Dependencies.Select(UnwrapNode).ToArray()),
+                f => StringFactoryNode(f, f.Dependencies.Select(UnwrapNode).ToArray()));
+
+        private string StringTransientNode(TransientDependencyNode node, string[] dependencies)
+            => $"new {node.TypeName}({string.Join(", ", dependencies)})";
+
+        private string StringSingletonNode(SingletonDependencyNode node, string[] dependencies)
+            => $"(_SingletonInstances.__{node.InstanceName} ??= new {node.TypeName}({string.Join(", ", dependencies)}))";
+
+        private string StringDelegateNode(DelegateDependencyNode node, string[] dependencies)
+            => $"(({node.DelegateRegistrationTypeName}<{node.TypeName}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.TypeNames())}>)this).Create({string.Join(", ", dependencies)})";
+
+        private string StringFactoryNode(FactoryDependencyNode node, string[] dependencies)
+            => $"(_SingletonInstances.__{node.InstanceName} ??= new {node.ImplimentationName}({string.Join(", ", new[] { "_SingletonInstances" }.Concat(dependencies))}))";
 
 
-
-        private string TransientNode(TransientRegistration node, string[] dependencies)
-            => $"new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)})";
-
-        private string SingletonNode(SingletonRegistration node, string[] dependencies)
-            => $"(_SingletonInstances.__{node.Service.Name} ??= new {node.Implementation.FullyQualifiedTypeName()}({string.Join(", ", dependencies)}))";
-
-        private string DelegateNode(DelegateRegistration node, string[] dependencies)
-            => $"(({node.DelegateType.RecursiveContainingSymbol()}<{node.Service.FullyQualifiedTypeName()}{(dependencies.Any() ? "," : string.Empty)} {string.Join(", ", node.Dependencies.Select(d => d.FullyQualifiedTypeName()))}>)this).Create({string.Join(", ", dependencies)})";
-
-        private string FactoryNode(FactoryRegistration node, string[] dependencies)
-            => $"(_SingletonInstances.__{node.Service.Name} ??= new {node.ImplimentationName}({string.Join(", ", new[] { "_SingletonInstances" }.Concat(dependencies))}))";
-
-
-
-        private string CreateSingletonVariableDeclaration(SingletonRegistration singletonRegistration)
-    => $"public {singletonRegistration.Service.FullyQualifiedTypeName()} __{singletonRegistration.Service.Name};";
-
-        private string CreateFactoryVariableDeclaration(FactoryRegistration factoryRegistration)
-            => $"public {factoryRegistration.Service.FullyQualifiedTypeName()} __{factoryRegistration.Service.Name};";
-
-        private string CreateServiceConstructorWithName(string constructorName, ITypeSymbol serviceType, DependencyGraph dependencyGraph)
-            => $"public {serviceType.FullyQualifiedTypeName()} {constructorName}() => {ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph)};";
-
-        private string CreateServiceConstructor(ITypeSymbol serviceType, DependencyGraph dependencyGraph)
-            => CreateServiceConstructorWithName($"Create{serviceType.Name}", serviceType, dependencyGraph);
-
-        private string CreateFactoryClassDeclaration(FactoryRegistration factoryRegistration, DependencyGraph dependencyGraph)
-            => @$"private class {factoryRegistration.ImplimentationName} : {factoryRegistration.Service.FullyQualifiedTypeName()}
+        private string StringFactoryClassDeclarations()
+            => string.Join("\n\t\t", _factoryClassDeclarations.Select(f => $@"
+        private class {f.FactoryImplimentationClassName} : {f.FactoryTypeName}
         {{
             private readonly SingletonInstances _SingletonInstances;
 
-            public {factoryRegistration.ImplimentationName}(SingletonInstances singletonInstances) => _SingletonInstances = singletonInstances;
+            public {f.FactoryImplimentationClassName}(SingletonInstances singletonInstances) => _SingletonInstances = singletonInstances;
 
-            {string.Join("\n\t\t\t", factoryRegistration.ServiceMethods.Select(method => CreateServiceConstructorWithName(method.Name, method.ReturnType, dependencyGraph)))}
-        }}";
-    }
-
-    internal class FactoryClassDeclaration
-    {
-        public FactoryClassDeclaration(string factoryImplimentationClassName, string factoryTypeName, ServiceConstructor[] serviceConstructorMethods)
-        {
-            FactoryImplimentationClassName = factoryImplimentationClassName;
-            FactoryTypeName = factoryTypeName;
-            ServiceConstructorMethods = serviceConstructorMethods;
-        }
-
-        public string FactoryImplimentationClassName { get; }
-        public string FactoryTypeName { get; }
-        public ServiceConstructor[] ServiceConstructorMethods { get; }
-    }
-
-    internal class SingletonVariableDeclaration
-    {
-        public SingletonVariableDeclaration(string singletonTypeName, string singletonVariableName)
-        {
-            SingletonTypeName = singletonTypeName;
-            SingletonVariableName = singletonVariableName;
-        }
-
-        public string SingletonTypeName { get; }
-        public string SingletonVariableName { get; }
+            {StringServiceConstructorMethods(f.ServiceConstructorMethods)}
+        }}
+"));
     }
 }
