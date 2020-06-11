@@ -35,11 +35,23 @@ namespace {_namespace}
             {StringSingletonVariableDeclarations()}
         }}
 
+        public override T Resolve<T>()
+        {{
+            switch(typeof(T).FullName)
+            {{
+                {StringResolveMethodSwitches()}
+            }}
+            throw new System.Exception($""Type {{typeof(T)}} not found"");
+        }}
+
         {StringServiceConstructorMethods(_serviceConstructorMethods)}
 
         {StringFactoryClassDeclarations()}
     }}
 }}";
+
+        private string StringResolveMethodSwitches()
+            => string.Join("\n\t\t\t\t", _serviceConstructorMethods.Select(m => $"case \"{m.ServiceTypeName}\": return (T)(object){UnwrapNode(m.Dependencies)};"));
 
         private string StringSingletonVariableDeclarations()
             => string.Join("\n\t\t\t", _singletonVariableDeclarations.Select(s => $"public {s.SingletonTypeName} __{s.SingletonVariableName};"));
