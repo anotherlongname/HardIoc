@@ -35,13 +35,14 @@ namespace {_namespace}
             {StringSingletonVariableDeclarations()}
         }}
 
-        public override T Resolve<T>()
+        public override bool TryResolve(Type serviceType, out object service)
         {{
-            switch(typeof(T).FullName)
+            switch(serviceType.FullName)
             {{
                 {StringResolveMethodSwitches()}
             }}
-            throw new System.Exception($""Type {{typeof(T)}} not found"");
+            service = default;
+            return false;
         }}
 
         {StringServiceConstructorMethods(_serviceConstructorMethods)}
@@ -51,7 +52,7 @@ namespace {_namespace}
 }}";
 
         private string StringResolveMethodSwitches()
-            => string.Join("\n\t\t\t\t", _serviceConstructorMethods.Select(m => $"case \"{m.ServiceTypeName}\": return (T)(object){UnwrapNode(m.Dependencies)};"));
+            => string.Join("\n\t\t\t\t", _serviceConstructorMethods.Select(m => $"case \"{m.ServiceTypeName}\": service = (object){UnwrapNode(m.Dependencies)}; return true;"));
 
         private string StringSingletonVariableDeclarations()
             => string.Join("\n\t\t\t", _singletonVariableDeclarations.Select(s => $"public {s.SingletonTypeName} __{s.SingletonVariableName};"));

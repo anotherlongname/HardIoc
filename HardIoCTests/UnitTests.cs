@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HardIoC.Errors;
 using HardIoCTests.Models;
 using Xunit;
 
@@ -81,7 +82,7 @@ namespace HardIoCTests
         public void Resolve_NonexistentServiceShouldThrowException()
         {
             var container = new TestContainer();
-            new Action(() => container.Resolve<string>()).Should().Throw<Exception>();
+            new Action(() => container.Resolve<string>()).Should().Throw<ServiceNotFoundException>();
         }
 
     }
