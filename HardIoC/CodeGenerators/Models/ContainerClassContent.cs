@@ -9,14 +9,16 @@ namespace HardIoC.CodeGenerators.Models
         private readonly string _className;
         private readonly SingletonVariableDeclaration[] _singletonVariableDeclarations;
         private readonly ServiceConstructor[] _serviceConstructorMethods;
+        private readonly ResolvableService[] _allServiceMethods;
         private readonly FactoryClassDeclaration[] _factoryClassDeclarations;
 
-        public ContainerClassContent(string @namespace, string className, SingletonVariableDeclaration[] singletonVariableDeclarations, ServiceConstructor[] serviceConstructorMethods, FactoryClassDeclaration[] factoryClassDeclarations)
+        public ContainerClassContent(string @namespace, string className, SingletonVariableDeclaration[] singletonVariableDeclarations, ServiceConstructor[] serviceConstructorMethods, ResolvableService[] allServiceMethods, FactoryClassDeclaration[] factoryClassDeclarations)
         {
             _namespace = @namespace;
             _className = className;
             _singletonVariableDeclarations = singletonVariableDeclarations;
             _serviceConstructorMethods = serviceConstructorMethods;
+            _allServiceMethods = allServiceMethods;
             _factoryClassDeclarations = factoryClassDeclarations;
         }
 
@@ -52,7 +54,7 @@ namespace {_namespace}
 }}";
 
         private string StringResolveMethodSwitches()
-            => string.Join("\n\t\t\t\t", _serviceConstructorMethods.Select(m => $"case \"{m.ServiceTypeName}\": service = (object){UnwrapNode(m.Dependencies)}; return true;"));
+            => string.Join("\n\t\t\t\t", _allServiceMethods.Select(m => $"case \"{m.ServiceTypeName}\": service = (object){UnwrapNode(m.Dependencies)}; return true;"));
 
         private string StringSingletonVariableDeclarations()
             => string.Join("\n\t\t\t", _singletonVariableDeclarations.Select(s => $"public {s.SingletonTypeName} __{s.SingletonVariableName};"));
