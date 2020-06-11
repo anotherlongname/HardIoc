@@ -68,6 +68,21 @@ namespace HardIoCTests
 
             singleton.Should().Be(otherSingleton);
         }
- 
+
+        [Fact]
+        public void Resolve_ExistingServiceReturnsSuccessfully()
+        {
+            var container = new TestContainer();
+            var factory = container.Resolve<IExampleFactory>();
+            factory.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Resolve_NonexistentServiceShouldThrowException()
+        {
+            var container = new TestContainer();
+            new Action(() => container.Resolve<string>()).Should().Throw<Exception>();
+        }
+
     }
 }
