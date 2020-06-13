@@ -30,7 +30,7 @@ namespace HardIoCTests.Models
 
         public TestContainer()
         {
-            _stringDelegateContents = "Hello World!";
+            _stringDelegateContents = "Hello World! ";
         }
 
         public StringDelegate Create()

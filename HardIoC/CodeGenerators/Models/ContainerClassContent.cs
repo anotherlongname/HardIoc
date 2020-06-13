@@ -47,11 +47,19 @@ namespace {_namespace}
             return false;
         }}
 
+        public System.Collections.Generic.IEnumerable<Type> RegisteredServiceTypes()
+        {{
+            {StringRegisteredServiceTypes()}
+        }}
+
         {StringServiceConstructorMethods(_serviceConstructorMethods)}
 
         {StringFactoryClassDeclarations()}
     }}
 }}";
+
+        private string StringRegisteredServiceTypes()
+            => string.Join("\n\t\t\t", _allServiceMethods.Select(m => $"yield return typeof({m.ServiceTypeName});"));
 
         private string StringResolveMethodSwitches()
             => string.Join("\n\t\t\t\t", _allServiceMethods.Select(m => $"case \"{m.ServiceTypeName}\": service = (object){UnwrapNode(m.Dependencies)}; return true;"));
