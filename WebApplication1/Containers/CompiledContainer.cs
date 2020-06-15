@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions.Specialized;
 using HardIoC.IoC;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using WebApplication1.Handlers;
 
 namespace WebApplication1.Containers
@@ -16,22 +18,16 @@ namespace WebApplication1.Containers
         RegisterDelegateWithHandler<ReadConfiguration, ReadConfigurationHandler>,
         Register.Delegate<IConfiguration>
     {
-        private readonly Func<IServiceProvider> _getServiceProvider;
-
         public DoThing Create()
             => Resolve<DoThingHandler>().Handle;
 
         IConfiguration Register.Delegate<IConfiguration>.Create()
-            => (IConfiguration)_getServiceProvider().GetService(typeof(IConfiguration));
+            => (IConfiguration)ServiceProvider.GetService(typeof(IConfiguration));
 
         public ReadConfiguration Create(ReadConfigurationHandler handler)
             => handler.Handle;
-
-        public CompiledContainer(Func<IServiceProvider> getServiceProvider)
-        {
-            _getServiceProvider = getServiceProvider;
-        }
     }
+
 
     public interface RegisterDelegateWithHandler<T, U> : Register.Delegate<T, U>, Register.Transient<U> { }
 }

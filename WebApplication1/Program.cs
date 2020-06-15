@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WebApplication1.Containers;
 
 namespace WebApplication1
 {
@@ -21,6 +22,6 @@ namespace WebApplication1
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                }).UseServiceProviderFactory(new ServiceProviderFactory());
+                }).UseServiceProviderFactory(CompiledContainer.ServiceProviderFactory.Create());
     }
 }
