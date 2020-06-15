@@ -39,10 +39,7 @@ namespace {_namespace}
 
         public override bool TryResolve(Type serviceType, out object service)
         {{
-            switch(serviceType.FullName)
-            {{
-                {StringResolveMethodSwitches()}
-            }}
+            {(_allServiceMethods.Any() ? StringResolveSwitchStatement() : string.Empty)}
             service = default;
             return false;
         }}
@@ -59,7 +56,17 @@ namespace {_namespace}
 }}";
 
         private string StringRegisteredServiceTypes()
-            => string.Join("\n\t\t\t", _allServiceMethods.Select(m => $"yield return typeof({m.ServiceTypeName});"));
+            => _allServiceMethods.Any() ?
+                string.Join("\n\t\t\t", _allServiceMethods.Select(m => $"yield return typeof({m.ServiceTypeName});")) :
+                "yield break;";
+
+        private string StringResolveSwitchStatement()
+            => $@"
+            switch(serviceType.FullName)
+            {{
+                {StringResolveMethodSwitches()}
+            }}";
+                
 
         private string StringResolveMethodSwitches()
             => string.Join("\n\t\t\t\t", _allServiceMethods.Select(m => $"case \"{m.ServiceTypeName}\": service = (object){UnwrapNode(m.Dependencies)}; return true;"));

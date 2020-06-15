@@ -43,7 +43,7 @@ namespace HardIoC.CodeGenerators
             }
             catch (Exception ex)
             {
-                var descriptor = new DiagnosticDescriptor(DiagnosticConstants.UnknownExceptionId, "Unexpected error", $"Unknown error during generation: {ex.Message}", DiagnosticConstants.Category, DiagnosticSeverity.Error, true);
+                var descriptor = new DiagnosticDescriptor(DiagnosticConstants.UnknownExceptionId, "Unexpected error", $"Unknown error during generation: {ex.GetType()} {ex.Message}", DiagnosticConstants.Category, DiagnosticSeverity.Error, true);
                 context.ReportDiagnostic(Diagnostic.Create(descriptor, Location.None));
             }
         }
