@@ -10,7 +10,7 @@ using WebApplication1.Handlers;
 
 namespace WebApplication1.Containers
 {
-    public partial class CompiledContainer : Container,
+    public partial class CompiledContainer : AspNetCoreContainer,
         Register.Delegate<DoThing>,
         Register.Transient<DoThingHandler>,
         //Register.Delegate<ReadConfiguration, ReadConfigurationHandler>,
