@@ -18,14 +18,10 @@ namespace {_namespace}
 {{
     public partial class {_className}
     {{
-        private readonly Func<IServiceProvider> _getServiceProvider;
-
         private {_className}(Func<IServiceProvider> getServiceProvider)
+            : base(getServiceProvider)
         {{
-            _getServiceProvider = getServiceProvider;
         }}
-
-        private IServiceProvider ServiceProvider => _getServiceProvider();
 
         public class ServiceProviderFactory : Microsoft.Extensions.DependencyInjection.IServiceProviderFactory<Microsoft.Extensions.DependencyInjection.IServiceCollection>
         {{
