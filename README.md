@@ -13,6 +13,6 @@ C# Compile-time IoC container generator made possible using Roslyn Code Generato
 - [ ] Parameterized Factory Registration
 - [ ] Validation of dependency graph
 - [ ] Correct error handling and code highlighting
-- [ ] Change `ConstructorFor` entrypoints with `Resolve<T>` instances
+- ~~[ ] Change `ConstructorFor` entrypoints with `Resolve<T>` instances~~ Now doing both methods instead
 - [ ] Usage documentation
 - [ ] Think of a better name
