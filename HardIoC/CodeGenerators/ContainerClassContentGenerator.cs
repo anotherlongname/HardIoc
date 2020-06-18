@@ -26,12 +26,13 @@ namespace HardIoC.CodeGenerators
             var dependencyGraph = DependencyGraph.FromRegistrations(registrations);
 
             var serviceConstructorMethods = typesRequiringConstructors.Select(t => CreateServiceConstructor(t, dependencyGraph)).ToArray();
+            var allServiceMethods = dependencyGraph.Registrations.Select(r => CreateResolvableService(r.Service(), dependencyGraph)).ToArray();
 
             var factoryClasses = registrations.FactoryRegistrations().Select(f => CreateFactoryClassDeclaration(f, dependencyGraph)).ToArray();
             var singletonVariableDeclarations = dependencyGraph.Registrations.SingletonRegistrations().Select(CreateSingletonVariableDeclaration)
                 .Concat(registrations.FactoryRegistrations().Select(CreateFactoryVariableDeclaration)).ToArray();
 
-            var content = new ContainerClassContent(containerClassDescription.FullyQualifiedNamespace, containerClassDescription.ShortName, singletonVariableDeclarations, serviceConstructorMethods, factoryClasses);
+            var content = new ContainerClassContent(containerClassDescription.FullyQualifiedNamespace, containerClassDescription.ShortName, singletonVariableDeclarations, serviceConstructorMethods, allServiceMethods, factoryClasses);
             return content.AsString();
         }
 
@@ -46,6 +47,9 @@ namespace HardIoC.CodeGenerators
 
         private SingletonVariableDeclaration CreateFactoryVariableDeclaration(FactoryRegistration factoryRegistration)
             => new SingletonVariableDeclaration(factoryRegistration.Service.FullyQualifiedTypeName(), factoryRegistration.Service.Name);
+
+        private ResolvableService CreateResolvableService(ITypeSymbol serviceType, DependencyGraph dependencyGraph)
+            => new ResolvableService(serviceType.FullyQualifiedTypeName(), ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph));
 
         private ServiceConstructor CreateServiceConstructorWithName(string constructorName, ITypeSymbol serviceType, DependencyGraph dependencyGraph)
             => new ServiceConstructor(serviceType.FullyQualifiedTypeName(), constructorName, ProduceNode(dependencyGraph.Resolve(serviceType), dependencyGraph));

@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace HardIoC.CodeGenerators
 {
     [Generator]
-    internal class ContainerGenerator : ISourceGenerator
+    internal class AspNetCoreContainerGenerator : ISourceGenerator
     {
         public void Initialize(InitializationContext context) 
         {
@@ -21,12 +21,12 @@ namespace HardIoC.CodeGenerators
             try
             {
                 var registrationSymbols = RegistrationSymbols.FromCompilation(context.Compilation);
-                var containerClasses = context.LocateContainerSymbols(registrationSymbols.ContainerSymbol);
-                var generator = new ContainerClassContentGenerator(context, registrationSymbols);
+                var containerClasses = context.LocateContainerSymbols(registrationSymbols.AspNetCoreContainerSymbol);
+                var generator = new AspNetCoreContainerClassContentGenerator(context, registrationSymbols);
 
                 foreach(var containerClass in containerClasses)
                 {
-                    var hintName = $"Generated.{containerClass.FullyQualifiedName}";
+                    var hintName = $"Generated.AspNetCore.{containerClass.FullyQualifiedName}";
                     var content = generator.GenerateClassString(containerClass);
 
                     WriteOutDebugFile(hintName, content, context);

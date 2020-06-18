@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using HardIoC.Errors;
 using HardIoCTests.Models;
 using Xunit;
 
@@ -68,6 +69,21 @@ namespace HardIoCTests
 
             singleton.Should().Be(otherSingleton);
         }
- 
+
+        [Fact]
+        public void Resolve_ExistingServiceReturnsSuccessfully()
+        {
+            var container = new TestContainer();
+            var factory = container.Resolve<IExampleFactory>();
+            factory.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void Resolve_NonexistentServiceShouldThrowException()
+        {
+            var container = new TestContainer();
+            new Action(() => container.Resolve<string>()).Should().Throw<ServiceNotFoundException>();
+        }
+
     }
 }

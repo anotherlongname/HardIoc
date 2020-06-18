@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HardIoCTests", "HardIoCTests\HardIoCTests.csproj", "{0402D28F-EEEA-4842-A2A1-326EB0EC851B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{37B38AE3-E87D-4868-B4ED-28D28F69B616}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExampleAspNetCoreWebApplication", "ExampleAspNetCoreWebApplication\ExampleAspNetCoreWebApplication.csproj", "{902B4B0A-1E14-4C87-B089-1D2BAC66822D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,16 @@ Global
 		{0402D28F-EEEA-4842-A2A1-326EB0EC851B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0402D28F-EEEA-4842-A2A1-326EB0EC851B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0402D28F-EEEA-4842-A2A1-326EB0EC851B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{902B4B0A-1E14-4C87-B089-1D2BAC66822D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{902B4B0A-1E14-4C87-B089-1D2BAC66822D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{902B4B0A-1E14-4C87-B089-1D2BAC66822D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{902B4B0A-1E14-4C87-B089-1D2BAC66822D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{902B4B0A-1E14-4C87-B089-1D2BAC66822D} = {37B38AE3-E87D-4868-B4ED-28D28F69B616}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FCDFC527-9CE5-47BE-966A-FDC83A2211D3}

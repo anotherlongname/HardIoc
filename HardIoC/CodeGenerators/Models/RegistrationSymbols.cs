@@ -6,9 +6,10 @@ namespace HardIoC.CodeGenerators.Models
 {
     internal class RegistrationSymbols
     {
-        private RegistrationSymbols(INamedTypeSymbol containerSymbol, INamedTypeSymbol constructorForAttributeSymbol, INamedTypeSymbol[] transientSymbols, INamedTypeSymbol[] singletonSymbols, INamedTypeSymbol[] delegateSymbols, INamedTypeSymbol factorySymbol)
+        private RegistrationSymbols(INamedTypeSymbol containerSymbol, INamedTypeSymbol aspNetCoreContainerSymbol, INamedTypeSymbol constructorForAttributeSymbol, INamedTypeSymbol[] transientSymbols, INamedTypeSymbol[] singletonSymbols, INamedTypeSymbol[] delegateSymbols, INamedTypeSymbol factorySymbol)
         {
             ContainerSymbol = containerSymbol;
+            AspNetCoreContainerSymbol = aspNetCoreContainerSymbol;
             ConstructorForAttributeSymbol = constructorForAttributeSymbol;
             TransientSymbols = transientSymbols;
             SingletonSymbols = singletonSymbols;
@@ -17,6 +18,7 @@ namespace HardIoC.CodeGenerators.Models
         }
 
         public INamedTypeSymbol ContainerSymbol { get; }
+        public INamedTypeSymbol AspNetCoreContainerSymbol { get; }
         public INamedTypeSymbol ConstructorForAttributeSymbol { get; }
         public INamedTypeSymbol[] TransientSymbols { get; }
         public INamedTypeSymbol[] SingletonSymbols { get; }
@@ -26,6 +28,7 @@ namespace HardIoC.CodeGenerators.Models
         public static RegistrationSymbols FromCompilation(Compilation compilation)
             => new RegistrationSymbols(
                 GetType(compilation, typeof(Container)),
+                GetType(compilation, typeof(AspNetCoreContainer)),
                 GetType(compilation, typeof(ConstructorForAttribute)),
                 new[] { GetType(compilation, typeof(Register.Transient<>)), GetType(compilation, typeof(Register.Transient<,>)) },
                 new[] { GetType(compilation, typeof(Register.Singleton<>)), GetType(compilation, typeof(Register.Singleton<,>)) },
